@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Catalog\app\Repositories;
+namespace Modules\Catalog\Repositories;
 
 use App\Core\Repositories\BaseRepository;
-use Modules\Catalog\app\Models\Brand;
+use Modules\Catalog\Models\Brand;
 use Illuminate\Database\Eloquent\Collection;
 
 class BrandRepository extends BaseRepository

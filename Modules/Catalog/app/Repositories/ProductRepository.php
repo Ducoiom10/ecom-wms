@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Catalog\app\Repositories;
+namespace Modules\Catalog\Repositories;
 
 use App\Core\Repositories\BaseRepository;
-use Modules\Catalog\app\Models\Product;
+use Modules\Catalog\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 

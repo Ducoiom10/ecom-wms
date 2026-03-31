@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\PIM\app\Models;
+namespace Modules\PIM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,6 +40,6 @@ class GRNItem extends Model
 
     public function location()
     {
-        return $this->belongsTo('Modules\Inventory\app\Models\WarehouseLocation', 'location_id');
+        return $this->belongsTo('Modules\Inventory\Models\WarehouseLocation', 'location_id');
     }
 }

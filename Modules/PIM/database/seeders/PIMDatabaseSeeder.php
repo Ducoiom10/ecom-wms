@@ -6,11 +6,12 @@ use Illuminate\Database\Seeder;
 
 class PIMDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([
+            SupplierSeeder::class,
+            PurchaseOrderSeeder::class,
+            GoodsReceiptNoteSeeder::class,
+        ]);
     }
 }

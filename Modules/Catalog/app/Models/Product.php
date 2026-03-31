@@ -3,12 +3,12 @@
 namespace Modules\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Inventory\Models\Stock; // BẮT BUỘC IMPORT: Gọi Model từ Module Inventory sang
-use Modules\Catalog\app\Models\Brand;
-use Modules\Catalog\app\Models\Category;
-use Modules\Catalog\app\Models\ProductVariant;
-use Modules\Catalog\app\Models\ProductImage;
-use Modules\Catalog\app\Models\ProductAttributeValue;
+use Modules\Inventory\app\Models\Stock;
+use Modules\Catalog\Models\Brand;
+use Modules\Catalog\Models\Category;
+use Modules\Catalog\Models\ProductVariant;
+use Modules\Catalog\Models\ProductImage;
+use Modules\Catalog\Models\ProductAttributeValue;
 
 class Product extends Model
 {
@@ -32,12 +32,27 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
 
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
     public function attributeValues()
+    {
+        return $this->hasMany(ProductAttributeValue::class);
+    }
+
+    public function productAttributeValues()
     {
         return $this->hasMany(ProductAttributeValue::class);
     }

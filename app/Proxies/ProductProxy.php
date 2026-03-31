@@ -3,7 +3,7 @@
 namespace App\Proxies;
 
 use App\Core\DTOs\BaseDTO;
-use Modules\Catalog\app\Models\Product;
+use Modules\Catalog\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Exception;
 
@@ -158,8 +158,7 @@ class ProductProxy
      */
     public function invalidateAll(): bool
     {
-        Cache::forget('product:*');
-        return true;
+        return Cache::flush();
     }
 
     /**

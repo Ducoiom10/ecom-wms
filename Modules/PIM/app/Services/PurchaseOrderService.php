@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\PIM\app\Services;
+namespace Modules\PIM\Services;
 
 use App\Core\Services\BaseService;
-use Modules\PIM\app\Models\PurchaseOrder;
-use Modules\PIM\app\Models\PurchaseOrderItem;
-use Modules\PIM\app\Repositories\PurchaseOrderRepository;
-use Modules\Catalog\app\Repositories\ProductRepository;
+use Modules\PIM\Models\PurchaseOrder;
+use Modules\PIM\Models\PurchaseOrderItem;
+use Modules\PIM\Repositories\PurchaseOrderRepository;
+use Modules\Catalog\Repositories\ProductRepository;
 use Exception;
 use Illuminate\Support\Str;
 

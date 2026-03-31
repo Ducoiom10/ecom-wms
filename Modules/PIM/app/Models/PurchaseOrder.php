@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\PIM\app\Models;
+namespace Modules\PIM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,7 +41,7 @@ class PurchaseOrder extends Model
 
     public function warehouse()
     {
-        return $this->belongsTo('Modules\Inventory\app\Models\Warehouse', 'warehouse_id');
+        return $this->belongsTo('Modules\Inventory\Models\Warehouse', 'warehouse_id');
     }
 
     public function items()

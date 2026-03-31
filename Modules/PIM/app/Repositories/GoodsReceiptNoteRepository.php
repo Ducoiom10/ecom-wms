@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\PIM\app\Repositories;
+namespace Modules\PIM\Repositories;
 
 use App\Core\Repositories\BaseRepository;
-use Modules\PIM\app\Models\GoodsReceiptNote;
+use Modules\PIM\Models\GoodsReceiptNote;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 

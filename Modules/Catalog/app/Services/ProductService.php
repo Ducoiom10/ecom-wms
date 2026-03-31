@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\Catalog\app\Services;
+namespace Modules\Catalog\Services;
 
 use App\Core\Services\BaseService;
-use Modules\Catalog\app\Models\Product;
-use Modules\Catalog\app\Models\ProductVariant;
-use Modules\Catalog\app\Models\ProductImage;
-use Modules\Catalog\app\Repositories\ProductRepository;
-use Modules\Catalog\app\Repositories\BrandRepository;
-use Modules\Catalog\app\Repositories\ProductAttributeRepository;
+use Modules\Catalog\Models\Product;
+use Modules\Catalog\Models\ProductVariant;
+use Modules\Catalog\Models\ProductImage;
+use Modules\Catalog\Repositories\ProductRepository;
+use Modules\Catalog\Repositories\BrandRepository;
+use Modules\Catalog\Repositories\ProductAttributeRepository;
 use Illuminate\Http\UploadedFile;
 use Exception;
 

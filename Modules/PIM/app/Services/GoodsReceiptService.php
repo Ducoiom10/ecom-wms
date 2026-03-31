@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\PIM\app\Services;
+namespace Modules\PIM\Services;
 
 use App\Core\Services\BaseService;
-use Modules\PIM\app\Models\GoodsReceiptNote;
-use Modules\PIM\app\Models\GRNItem;
-use Modules\PIM\app\Repositories\GoodsReceiptNoteRepository;
-use Modules\PIM\app\Repositories\PurchaseOrderRepository;
+use Modules\PIM\Models\GoodsReceiptNote;
+use Modules\PIM\Models\GRNItem;
+use Modules\PIM\Repositories\GoodsReceiptNoteRepository;
+use Modules\PIM\Repositories\PurchaseOrderRepository;
 use Exception;
 use Illuminate\Support\Str;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Catalog\app\Repositories;
+namespace Modules\Catalog\Repositories;
 
 use App\Core\Repositories\BaseRepository;
-use Modules\Catalog\app\Models\ProductAttribute;
+use Modules\Catalog\Models\ProductAttribute;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProductAttributeRepository extends BaseRepository

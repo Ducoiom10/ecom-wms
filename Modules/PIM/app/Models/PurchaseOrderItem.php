@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\PIM\app\Models;
+namespace Modules\PIM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,7 +33,7 @@ class PurchaseOrderItem extends Model
 
     public function product()
     {
-        return $this->belongsTo('Modules\Catalog\app\Models\Product', 'product_id');
+        return $this->belongsTo('Modules\Catalog\Models\Product', 'product_id');
     }
 
     public function grnItems()

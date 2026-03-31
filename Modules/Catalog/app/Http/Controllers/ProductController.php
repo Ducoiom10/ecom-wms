@@ -3,27 +3,21 @@
 namespace Modules\Catalog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Catalog\Models\Product;
+use App\Http\Responses\ApiResponse;
+use App\Proxies\ProductProxy;
 
 class ProductController extends Controller
 {
-    public function show($id)
-    {
-        // Sử dụng Eager Loading để lấy dữ liệu liên quan
-        $product = Product::with([
-            'category',
-            'stocks.location.warehouse'
-        ])->find($id);
+    public function __construct(private ProductProxy $proxy) {}
 
-        if (!$product) {
-            return $this->errorResponse('Không tìm thấy sản phẩm', 404);
+    public function show(int $id)
+    {
+        $details = $this->proxy->getDetails($id);
+
+        if (!$details) {
+            return ApiResponse::error('Không tìm thấy sản phẩm', null, 404);
         }
 
-        $data = [
-            'product_info' => $product,
-            'total_available_stock' => $product->available_stock,
-        ];
-
-        return $this->successResponse($data, 'Lấy thông tin sản phẩm thành công');
+        return ApiResponse::success($details->toArray());
     }
 }

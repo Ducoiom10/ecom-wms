@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\PIM\app\Repositories;
+namespace Modules\PIM\Repositories;
 
 use App\Core\Repositories\BaseRepository;
-use Modules\PIM\app\Models\PurchaseOrder;
+use Modules\PIM\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 

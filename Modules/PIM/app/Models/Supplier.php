@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\PIM\app\Models;
+namespace Modules\PIM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
