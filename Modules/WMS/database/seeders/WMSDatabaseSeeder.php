@@ -1,0 +1,16 @@
+<?php
+
+namespace Modules\WMS\Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class WMSDatabaseSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // $this->call([]);
+    }
+}

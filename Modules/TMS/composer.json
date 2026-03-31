@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/tms",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\TMS\\": "app/",
+            "Modules\\TMS\\Database\\Factories\\": "database/factories/",
+            "Modules\\TMS\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\TMS\\Tests\\": "tests/"
+        }
+    }
+}

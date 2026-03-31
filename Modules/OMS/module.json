@@ -1,0 +1,11 @@
+{
+    "name": "OMS",
+    "alias": "oms",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\OMS\\Providers\\OMSServiceProvider"
+    ],
+    "files": []
+}

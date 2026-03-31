@@ -1,0 +1,11 @@
+{
+    "name": "TMS",
+    "alias": "tms",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TMS\\Providers\\TMSServiceProvider"
+    ],
+    "files": []
+}

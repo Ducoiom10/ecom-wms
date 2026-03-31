@@ -38,9 +38,22 @@ return [
     */
 
     'guards' => [
+        // Web guard for admin dashboard
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+
+        // API guard for customers (token/sanctum based)
+        'api' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // Separate guard for admin APIs if needed
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
         ],
     ],
 
@@ -62,9 +75,16 @@ return [
     */
 
     'providers' => [
+        // Default user provider (customers & general users)
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        // Admin provider (if using separate admin model)
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_ADMIN_MODEL', User::class),
         ],
 
         // 'users' => [

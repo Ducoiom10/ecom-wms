@@ -1,0 +1,11 @@
+{
+    "name": "PIM",
+    "alias": "pim",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PIM\\Providers\\PIMServiceProvider"
+    ],
+    "files": []
+}

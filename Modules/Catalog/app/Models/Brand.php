@@ -1,0 +1,32 @@
+<?php
+
+namespace Modules\Catalog\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Brand extends Model
+{
+    use HasFactory;
+
+    protected $table = 'brands';
+
+    protected $fillable = [
+        'name',
+        'logo_url',
+        'description',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    /**
+     * Relations
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+}

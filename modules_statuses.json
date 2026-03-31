@@ -1,0 +1,11 @@
+{
+    "Catalog": true,
+    "Inventory": true,
+    "PIM": true,
+    "WMS": true,
+    "OMS": true,
+    "Cart": true,
+    "Pricing": true,
+    "TMS": true,
+    "Finance": true
+}
