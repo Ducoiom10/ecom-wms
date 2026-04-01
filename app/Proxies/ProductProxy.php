@@ -56,20 +56,45 @@ class ProductProxy
     }
 
     /**
-     * Get multiple products details with caching
+     * Get multiple products details — single bulk query, then populate per-item cache.
+     * Avoids N+1: one WITH() query instead of N separate getDetails() calls.
      */
     public function getMultipleDetails(array $productIds): array
     {
-        $products = [];
+        // Serve cached items first, collect uncached ids
+        $result    = [];
+        $uncached  = [];
 
-        foreach ($productIds as $productId) {
-            $product = $this->getDetails($productId);
-            if ($product) {
-                $products[$productId] = $product;
+        foreach ($productIds as $id) {
+            $cached = Cache::get(self::CACHE_KEY_PREFIX . $id);
+            if ($cached) {
+                $result[$id] = $cached;
+            } else {
+                $uncached[] = $id;
             }
         }
 
-        return $products;
+        if (empty($uncached)) {
+            return $result;
+        }
+
+        // Single query for all uncached products
+        $models = Product::with([
+            'category',
+            'brand',
+            'productVariants',
+            'productImages',
+            'productAttributeValues.attribute',
+            'stocks',
+        ])->findMany($uncached);
+
+        foreach ($models as $product) {
+            $dto = $this->mapProductToDTO($product);
+            Cache::put(self::CACHE_KEY_PREFIX . $product->id, $dto, self::CACHE_TTL);
+            $result[$product->id] = $dto;
+        }
+
+        return $result;
     }
 
     /**
@@ -176,24 +201,13 @@ class ProductProxy
     }
 
     /**
-     * Warm up cache for frequently accessed products
+     * Warm up cache for frequently accessed products.
+     * Delegates to getMultipleDetails to avoid N+1.
      */
     public function warmupCache(array $productIds): array
     {
-        $warmed = [];
-
-        foreach ($productIds as $productId) {
-            try {
-                $product = $this->getDetails($productId);
-                if ($product) {
-                    $warmed[] = $productId;
-                }
-            } catch (Exception $e) {
-                \Log::warning("Failed to warmup cache for product {$productId}: " . $e->getMessage());
-            }
-        }
-
-        return $warmed;
+        $result = $this->getMultipleDetails($productIds);
+        return array_keys($result);
     }
 
     /**

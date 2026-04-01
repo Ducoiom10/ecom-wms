@@ -30,16 +30,16 @@ class PricingService
         $loyalty  = new LoyaltyPointsCalculator($loyaltyPoints);
         $voucher->setNext($loyalty);
         $discountedSubtotal = $voucher->calculate($subtotal);
-
         $discount = round($subtotal - $discountedSubtotal, 2);
 
         // Phase 2: tax then shipping on discounted subtotal
-        $tax  = new TaxCalculator($region);
-        $ship = new ShippingCalculator($discountedSubtotal);
-        $tax->setNext($ship);
-        $total = $tax->calculate($discountedSubtotal);
+        // Reuse the same TaxCalculator instance to avoid rate divergence.
+        $taxCalc = new TaxCalculator($region);
+        $ship    = new ShippingCalculator($discountedSubtotal);
+        $taxCalc->setNext($ship);
+        $total = $taxCalc->calculate($discountedSubtotal);
 
-        $taxAmount      = round($discountedSubtotal * (new TaxCalculator($region))->getRate(), 2);
+        $taxAmount      = round($discountedSubtotal * $taxCalc->getRate(), 2);
         $shippingAmount = $discountedSubtotal >= 100.0 ? 0.0 : 5.0;
 
         return [

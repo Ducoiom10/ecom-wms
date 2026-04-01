@@ -13,8 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Register middleware aliases for role-based access control
         $middleware->alias([
-            'is.admin' => \App\Http\Middleware\EnsureIsAdmin::class,
-            'is.customer' => \App\Http\Middleware\EnsureIsCustomer::class,
+            'is.admin'         => \App\Http\Middleware\EnsureIsAdmin::class,
+            'is.customer'      => \App\Http\Middleware\EnsureIsCustomer::class,
+            'check.permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

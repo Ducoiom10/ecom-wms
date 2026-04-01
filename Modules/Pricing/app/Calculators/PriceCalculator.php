@@ -6,10 +6,12 @@ abstract class PriceCalculator
 {
     private ?PriceCalculator $next = null;
 
-    public function setNext(PriceCalculator $next): static
+    public function setNext(PriceCalculator $next): PriceCalculator
     {
         $this->next = $next;
-        return $next; // return $next so chaining works: $a->setNext($b)->setNext($c)
+        // Returns $next (not $this) to enable forward-chaining:
+        // $a->setNext($b)->setNext($c)  means chain is a → b → c
+        return $next;
     }
 
     abstract public function calculate(float $price): float;

@@ -50,27 +50,33 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Check if user is an admin
-     */
-    public function isAdmin(): bool
+    public function roles()
     {
-        return $this->role === 'admin';
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(\Modules\CRM\Models\Address::class);
+    }
+
+    public function loyaltyAccount()
+    {
+        return $this->hasOne(\Modules\CRM\Models\LoyaltyAccount::class);
     }
 
     /**
-     * Check if user is a customer
+     * Check permission across all assigned roles.
+     * Result is cached per-request to avoid repeated DB hits.
      */
-    public function isCustomer(): bool
+    public function hasPermission(string $permission): bool
     {
-        return $this->role === 'customer';
+        return $this->roles->contains(
+            fn($role) => $role->hasPermission($permission)
+        );
     }
 
-    /**
-     * Check if user is active
-     */
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
+    public function isAdmin(): bool    { return $this->role === 'admin'; }
+    public function isCustomer(): bool { return $this->role === 'customer'; }
+    public function isActive(): bool   { return $this->is_active; }
 }

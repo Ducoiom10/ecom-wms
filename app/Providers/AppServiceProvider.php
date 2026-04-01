@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register RBAC migrations from subfolder so RefreshDatabase picks them up.
+        $this->loadMigrationsFrom(database_path('migrations/rbac'));
     }
 }

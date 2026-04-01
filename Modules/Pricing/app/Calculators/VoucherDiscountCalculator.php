@@ -4,10 +4,17 @@ namespace Modules\Pricing\Calculators;
 
 class VoucherDiscountCalculator extends PriceCalculator
 {
+    private float $percentage;
+    private float $fixedAmount;
+
     public function __construct(
-        private readonly float  $percentage = 0.0,  // e.g. 10 = 10%
-        private readonly float  $fixedAmount = 0.0, // e.g. 5.00
-    ) {}
+        float $percentage = 0.0,
+        float $fixedAmount = 0.0,
+    ) {
+        // Cap percentage to valid range to prevent free-order exploit
+        $this->percentage  = min(100.0, max(0.0, $percentage));
+        $this->fixedAmount = max(0.0, $fixedAmount);
+    }
 
     public function calculate(float $price): float
     {

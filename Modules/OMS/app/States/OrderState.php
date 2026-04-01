@@ -22,8 +22,17 @@ abstract class OrderState
 
     protected function transition(string $status, array $extra = []): void
     {
-        $this->order->fill(array_merge(['status' => $status], $extra));
-        $this->order->save();
+        // Bypass $fillable guard: status is intentionally excluded from fillable
+        // to prevent mass-assignment, but state machine must be able to set it.
+        $payload = array_merge(['status' => $status], $extra);
+        \Illuminate\Support\Facades\DB::table('orders')
+            ->where('id', $this->order->id)
+            ->update($payload);
+
+        // Sync in-memory model so callers see the new state immediately.
+        foreach ($payload as $key => $value) {
+            $this->order->$key = $value;
+        }
     }
 
     private function invalid(string $action): void

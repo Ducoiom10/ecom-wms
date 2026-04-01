@@ -7,5 +7,6 @@
     "Cart": true,
     "Pricing": true,
     "TMS": true,
-    "Finance": true
+    "Finance": true,
+    "CRM": true
 }

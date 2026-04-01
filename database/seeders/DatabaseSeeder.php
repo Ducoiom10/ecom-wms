@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CatalogDatabaseSeeder::class,
             InventoryDatabaseSeeder::class,
             PIMDatabaseSeeder::class,
+            RBACSeeder::class,
         ]);
     }
 }

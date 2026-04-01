@@ -8,11 +8,18 @@ use Modules\OMS\States\OrderStateFactory;
 class Order extends Model
 {
     protected $fillable = [
-        'user_id', 'warehouse_id', 'status',
+        'user_id', 'warehouse_id',
         'subtotal', 'discount', 'tax', 'shipping', 'total',
         'region', 'coupon_code', 'delivery_address',
         'approved_at', 'shipped_at', 'delivered_at',
         'cancelled_at', 'cancel_reason',
+        // NOTE: 'status' intentionally excluded from $fillable.
+        // Status must only change via the State Machine (OrderStateFactory).
+        // Use $order->update(['status' => ...]) directly only in trusted internal code.
+    ];
+
+    protected $attributes = [
+        'status' => 'pending',
     ];
 
     protected $casts = [
@@ -49,6 +56,16 @@ class Order extends Model
     public function handleReturn(): void  { OrderStateFactory::create($this)->handleReturn(); }
     public function processRefund(): void { OrderStateFactory::create($this)->processRefund(); }
     public function deny(): void       { OrderStateFactory::create($this)->deny(); }
+
+    /**
+     * Force-set status bypassing State Machine — for internal/test use only.
+     * Uses DB update to bypass $fillable guard.
+     */
+    public function forceStatus(string $status): void
+    {
+        static::where('id', $this->id)->update(['status' => $status]);
+        $this->status = $status;
+    }
 
     // ── Helpers ─────────────────────────────────────────────────
     public function isCancellable(): bool

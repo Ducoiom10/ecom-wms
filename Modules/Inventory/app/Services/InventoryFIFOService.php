@@ -21,14 +21,11 @@ class InventoryFIFOService extends BaseService
         return DB::transaction(function () use ($productId, $quantity, $warehouseId) {
             $query = InventoryBatch::where('product_id', $productId)
                 ->where('quantity', '>', 0)
-                ->where(fn($q) => $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now()))
-                // orderBy fifo_sequence rồi id: đảm bảo thứ tự lock nhất quán,
-                // tránh deadlock khi 2 transaction cùng reserve cùng product.
-                ->orderBy('fifo_sequence')
-                ->orderBy('id');
+                ->where(fn($q) => $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now())) // bỏ qua batch đã hết hạn
+                ->orderBy('fifo_sequence');
 
             if ($warehouseId) {
-                $query->whereHas('location', fn($q) => $q->where('warehouse_id', $warehouseId)->where('is_active', true));
+                $query->whereHas('location', fn($q) => $q->where('warehouse_id', $warehouseId)->where('is_active', true)); // chỉ lấy batch ở kho cụ thể và kho phải đang hoạt động
             }
 
             $batches = $query->lockForUpdate()->get();
@@ -37,11 +34,8 @@ class InventoryFIFOService extends BaseService
             $remaining = $quantity;
 
             foreach ($batches as $batch) {
-                // Dùng quantity hiện tại trên model (đã được lock),
-                // không dùng giá trị stale sau lần decrement trước.
                 $allocate = min($batch->quantity, $remaining);
                 $batch->decrement('quantity', $allocate);
-                $batch->quantity -= $allocate; // cập nhật in-memory tránh stale read
 
                 $reserved[] = [
                     'batch_id'     => $batch->id,
@@ -72,8 +66,8 @@ class InventoryFIFOService extends BaseService
      */
     public function deductStockBatch(array $items, string $referenceType, int $referenceId): array
     {
-        // Sort by product_id ASC — every transaction acquires locks in the same order,
-        // eliminating the circular-wait condition that causes deadlocks.
+        // Cho ngắn gọn code trong transaction, sort trước để tất cả transaction đều lock theo cùng thứ tự product_id,
+        // giảm thiểu deadlock khi có nhiều đơn hàng cùng sản phẩm.
         usort($items, fn($a, $b) => $a['product_id'] <=> $b['product_id']);
 
         return DB::transaction(function () use ($items, $referenceType, $referenceId) {
@@ -122,7 +116,15 @@ class InventoryFIFOService extends BaseService
     }
 
     /**
-     * Release reserved stock back (e.g. order cancelled).
+     * Thực hiện release stock đã được reserve (ví dụ khi hủy đơn hàng), tăng lại quantity và giảm reserved_quantity.
+     * Ghi log vào StockMovement để theo dõi lịch sử.
+     *
+     * @param int $productId
+     * @param int $quantity
+     * @param string $referenceType
+     * @param int $referenceId
+     * @return void
+     * @throws Exception
      */
     public function releaseReserved(int $productId, int $quantity, string $referenceType, int $referenceId): void
     {

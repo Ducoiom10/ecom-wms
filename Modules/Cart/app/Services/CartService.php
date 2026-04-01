@@ -20,10 +20,13 @@ class CartService
         return "cart:{$userId}";
     }
 
+    private const MAX_ITEMS = 50;
+
     private function get(string $userId): array
     {
-        $raw = Redis::get($this->key($userId));
-        return $raw ? json_decode($raw, true) : ['items' => []];
+        $raw     = Redis::get($this->key($userId));
+        $decoded = $raw ? json_decode($raw, true) : null;
+        return is_array($decoded) ? $decoded : ['items' => []];
     }
 
     private function save(string $userId, array $data): void
@@ -53,10 +56,10 @@ class CartService
             throw new Exception('Quantity must be greater than 0.');
         }
 
-        // Resolve price from variant or product
+        // Resolve price via eager load — 1 query instead of 2
         if ($variantId) {
-            $variant = ProductVariant::findOrFail($variantId);
-            $price   = $variant->price_override ?? Product::findOrFail($productId)->price;
+            $variant = ProductVariant::with('product')->findOrFail($variantId);
+            $price   = $variant->price_override ?? $variant->product->price;
         } else {
             $price = Product::findOrFail($productId)->price;
         }
@@ -69,6 +72,9 @@ class CartService
         if ($index !== null) {
             $data['items'][$index]['quantity'] += $quantity;
         } else {
+            if (count($data['items']) >= self::MAX_ITEMS) {
+                throw new Exception('Cart is full. Maximum ' . self::MAX_ITEMS . ' items allowed.');
+            }
             $data['items'][] = [
                 'product_id' => $productId,
                 'variant_id' => $variantId,
@@ -112,10 +118,16 @@ class CartService
 
     public function applyCoupon(string $userId, string $couponCode): void
     {
-        // Coupon validation will be handled by PricingModule in Step 2
-        // Here we just store the code; actual discount applied at checkout
+        $code = strtoupper(trim($couponCode));
+
+        if (strlen($code) === 0 || strlen($code) > 20) {
+            throw new Exception('Invalid coupon code format.');
+        }
+
+        // Coupon existence validated by PricingModule at checkout;
+        // here we only store the sanitised code.
         $data           = $this->get($userId);
-        $data['coupon'] = strtoupper(trim($couponCode));
+        $data['coupon'] = $code;
         $this->save($userId, $data);
     }
 
