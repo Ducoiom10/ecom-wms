@@ -3,54 +3,47 @@
 namespace Modules\WMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
+use Modules\WMS\Models\PickList;
+use Modules\WMS\Services\PickListGenerator;
 
 class WMSController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private PickListGenerator $generator) {}
+
+    // GET /api/v1/wms
+    public function index(Request $request)
     {
-        return view('wms::index');
+        $lists = PickList::with(['warehouse', 'items'])
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->integer('limit', 20));
+
+        return ApiResponse::success($lists);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // GET /api/v1/wms/{id}
+    public function show(int $id)
     {
-        return view('wms::create');
+        $pickList = PickList::with(['warehouse', 'items.location'])->findOrFail($id);
+        $route    = $this->generator->getPickingRoute($pickList);
+
+        return ApiResponse::success(['pick_list' => $pickList, 'route' => $route]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    // POST /api/v1/wms/{id}/items/{itemId}/pick
+    public function markPicked(Request $request, int $id, int $itemId)
     {
-        return view('wms::show');
+        $validated = $request->validate([
+            'quantity_picked' => 'required|integer|min:1',
+        ]);
+
+        $pickList = PickList::findOrFail($id);
+        $item     = $pickList->items()->findOrFail($itemId);
+
+        $this->generator->markItemPicked($item, $validated['quantity_picked'], auth()->id());
+
+        return ApiResponse::success(['message' => 'Item marked as picked.']);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('wms::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

@@ -36,6 +36,12 @@
         <ProductCard v-for="r in related?.data" :key="r.id" :product="r" />
       </div>
     </div>
+
+    <!-- Reviews -->
+    <div class="mt-16 border-t pt-10 space-y-8">
+      <ProductReviewList :product-id="Number(route.params.id)" :key="reviewKey" />
+      <ProductReviewForm :product-id="Number(route.params.id)" @submitted="reviewKey++" />
+    </div>
   </div>
 </template>
 
@@ -45,6 +51,7 @@ import type { ProductVariant } from '~/types/models.types'
 const route      = useRoute()
 const cartStore  = useCartStore()
 const qty        = ref(1)
+const reviewKey  = ref(0)
 const selectedVariant = ref<ProductVariant | null>(null)
 
 const { data: product } = await useAsyncData(`product-${route.params.id}`,
@@ -63,5 +70,30 @@ const addToCart = () => cartStore.addToCart(
 useSeoMeta({
   title: () => product.value?.name ?? '',
   description: () => product.value?.description ?? '',
+  ogTitle: () => product.value?.name ?? '',
+  ogDescription: () => product.value?.description ?? '',
+  ogImage: () => product.value?.productImages?.[0]?.image_url ?? '',
+})
+
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    children: computed(() => JSON.stringify({
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      name: product.value?.name,
+      description: product.value?.description,
+      sku: product.value?.sku,
+      image: product.value?.productImages?.map(i => i.image_url),
+      offers: {
+        '@type': 'Offer',
+        price: product.value?.price,
+        priceCurrency: 'VND',
+        availability: (product.value?.available_stock ?? 0) > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+      },
+    })),
+  }],
 })
 </script>

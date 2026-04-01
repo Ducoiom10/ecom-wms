@@ -3,7 +3,7 @@
 namespace Modules\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Inventory\app\Models\Stock;
+use Modules\Inventory\Models\Stock;
 use Modules\Catalog\Models\Brand;
 use Modules\Catalog\Models\Category;
 use Modules\Catalog\Models\ProductVariant;

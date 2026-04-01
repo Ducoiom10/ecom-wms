@@ -35,7 +35,7 @@ class ProductVariant extends Model
     public function stocks()
     {
         return $this->hasManyThrough(
-            'Modules\Inventory\app\Models\Stock',
+            \Modules\Inventory\Models\Stock::class,
             Product::class,
             'id',
             'product_id',

@@ -3,54 +3,47 @@
 namespace Modules\TMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
+use Modules\TMS\Jobs\SyncCarrierStatus;
+use Modules\TMS\Models\DeliveryZone;
+use Modules\TMS\Models\Shipment;
+use Modules\TMS\Services\ShipmentService;
 
 class TMSController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private ShipmentService $shipmentService) {}
+
+    // GET /api/v1/shipments
+    public function index(Request $request)
     {
-        return view('tms::index');
+        $shipments = Shipment::with(['zone', 'orders'])
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->integer('limit', 20));
+
+        return ApiResponse::success($shipments);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // GET /api/v1/shipments/{id}
+    public function show(int $id)
     {
-        return view('tms::create');
+        $shipment = Shipment::with(['zone', 'orders.items'])->findOrFail($id);
+        return ApiResponse::success($shipment);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    // POST /api/v1/shipments/{id}/sync-status
+    public function syncStatus(int $id)
     {
-        return view('tms::show');
+        $shipment = Shipment::findOrFail($id);
+        SyncCarrierStatus::dispatch($shipment);
+
+        return ApiResponse::success(['message' => 'Status sync queued.']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    // GET /api/v1/delivery-zones
+    public function deliveryZones()
     {
-        return view('tms::edit');
+        return ApiResponse::success(DeliveryZone::all());
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

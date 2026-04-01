@@ -68,7 +68,7 @@ class CRMController extends Controller
             'is_default'  => 'boolean',
         ]);
 
-        $address = $this->reviewService->addAddress($request->user(), $data);
+        $address = $request->user()->addresses()->create($data);
         return response()->json($address, 201);
     }
 

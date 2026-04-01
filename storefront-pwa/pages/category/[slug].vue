@@ -14,7 +14,7 @@
           </select>
         </div>
         <div v-if="pending" class="grid grid-cols-2 md:grid-cols-3 gap-6">
-          <ProductSkeletonCard v-for="i in 9" :key="i" />
+          <UiSkeletonCard v-for="i in 9" :key="i" />
         </div>
         <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-6">
           <ProductCard v-for="p in products?.data" :key="p.id" :product="p" />

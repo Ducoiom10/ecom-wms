@@ -8,11 +8,10 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable;
 
     protected $fillable = ['name', 'email', 'password', 'role', 'is_active'];
 
@@ -27,7 +26,6 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    // Filament: chỉ admin/staff vào được panel
     public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->role, ['admin', 'warehouse_mgr', 'staff', 'finance'])
@@ -49,22 +47,10 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(\Modules\CRM\Models\LoyaltyAccount::class);
     }
 
-    // Check permission via RBAC roles
     public function hasPermission(string $permission): bool
     {
         if ($this->role === 'admin') return true;
-
-        return $this->roles->contains(
-            fn($role) => $role->hasPermission($permission)
-        );
-    }
-
-    // Filament Shield-compatible
-    public function can($abilities, $arguments = []): bool
-    {
-        if ($this->role === 'admin') return true;
-        if (is_string($abilities)) return $this->hasPermission($abilities);
-        return parent::can($abilities, $arguments);
+        return $this->roles->contains(fn($role) => $role->hasPermission($permission));
     }
 
     public function isAdmin(): bool    { return $this->role === 'admin'; }

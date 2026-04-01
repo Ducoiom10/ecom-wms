@@ -39,9 +39,8 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      crawlLinks: true,
+      crawlLinks: false,
       routes: ['/'],
-      ignore: ['/account', '/checkout'],
     },
   },
 

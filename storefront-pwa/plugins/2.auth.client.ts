@@ -1,4 +1,7 @@
-export default defineNuxtPlugin(() => {
-  const authStore = useAuthStore()
+export default defineNuxtPlugin(async () => {
+  const authStore     = useAuthStore()
+  const wishlistStore = useWishlistStore()
+
   authStore.hydrate()
+  await wishlistStore.hydrate()
 })

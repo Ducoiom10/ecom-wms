@@ -2,6 +2,27 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\FinanceDashboard;
+use App\Filament\Pages\OrderKanban;
+use App\Filament\Pages\WarehouseMap;
+use App\Filament\Resources\BrandResource;
+use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\PickListResource;
+use App\Filament\Resources\ProductAttributeResource;
+use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\StockResource;
+use App\Filament\Resources\UserResource;
+use App\Filament\Resources\LoyaltyAccountResource;
+use App\Filament\Resources\ReviewResource;
+use App\Filament\Resources\ShipmentResource;
+use App\Filament\Resources\SupplierResource;
+use App\Filament\Resources\WarehouseLocationResource;
+use App\Filament\Resources\WarehouseResource;
+use App\Filament\Widgets\CancellationRateWidget;
+use App\Filament\Widgets\FinanceStatsWidget;
+use App\Filament\Widgets\RevenueChartWidget;
+use App\Filament\Widgets\StatsOverviewWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,15 +49,41 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
+            ->resources([
+                // Catalog
+                CategoryResource::class,
+                ProductResource::class,
+                BrandResource::class,
+                ProductAttributeResource::class,
+                // Inventory & WMS
+                WarehouseResource::class,
+                WarehouseLocationResource::class,
+                StockResource::class,
+                PickListResource::class,
+                // OMS
+                OrderResource::class,
+                // IAM
+                UserResource::class,
+                // PIM
+                SupplierResource::class,
+                // TMS
+                ShipmentResource::class,
+                // CRM
+                ReviewResource::class,
+                LoyaltyAccountResource::class,
+            ])
             ->pages([
                 Pages\Dashboard::class,
+                OrderKanban::class,
+                WarehouseMap::class,
+                FinanceDashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                StatsOverviewWidget::class,
+                RevenueChartWidget::class,
+                CancellationRateWidget::class,
+                FinanceStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
