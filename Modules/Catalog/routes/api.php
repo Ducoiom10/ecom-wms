@@ -1,14 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Catalog\Http\Controllers\CatalogController;
 use Modules\Catalog\Http\Controllers\ProductController;
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('catalogs', CatalogController::class)->names('catalog');
-});
-
+// Public product endpoints (no auth required for storefront)
 Route::prefix('v1')->group(function () {
-    // Đường dẫn thực tế sẽ là: GET /api/catalog/v1/products/{id}
-    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::get('/products',          [ProductController::class, 'index']);
+    Route::get('/products/search',   [ProductController::class, 'search']);
+    Route::get('/products/filters',  [ProductController::class, 'filters']);
+    Route::get('/products/{id}',     [ProductController::class, 'show']);
+    Route::get('/products/{id}/related', [ProductController::class, 'related']);
 });
