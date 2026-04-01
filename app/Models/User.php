@@ -2,22 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -26,28 +22,24 @@ class User extends Authenticatable
         'is_active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
         ];
+    }
+
+    // FilamentUser contract — chỉ admin mới vào được panel
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin() && $this->isActive();
     }
 
     public function roles()
@@ -65,10 +57,6 @@ class User extends Authenticatable
         return $this->hasOne(\Modules\CRM\Models\LoyaltyAccount::class);
     }
 
-    /**
-     * Check permission across all assigned roles.
-     * Result is cached per-request to avoid repeated DB hits.
-     */
     public function hasPermission(string $permission): bool
     {
         return $this->roles->contains(
@@ -78,5 +66,5 @@ class User extends Authenticatable
 
     public function isAdmin(): bool    { return $this->role === 'admin'; }
     public function isCustomer(): bool { return $this->role === 'customer'; }
-    public function isActive(): bool   { return $this->is_active; }
+    public function isActive(): bool   { return (bool) $this->is_active; }
 }
