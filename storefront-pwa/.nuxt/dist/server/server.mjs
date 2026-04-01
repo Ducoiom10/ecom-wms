@@ -668,7 +668,8 @@ const unhead_k2P3m_ZDyjlr2mMYnoDPwavjsDN8hBlk9cFai0bbopU = /* @__PURE__ */ defin
 function toArray$2(value) {
   return Array.isArray(value) ? value : [value];
 }
-const __nuxt_page_meta$9 = { layout: "checkout" };
+const __nuxt_page_meta$a = { layout: "checkout" };
+const __nuxt_page_meta$9 = { layout: "account" };
 const __nuxt_page_meta$8 = { layout: "account" };
 const __nuxt_page_meta$7 = { layout: "account" };
 const __nuxt_page_meta$6 = { layout: "account" };
@@ -682,7 +683,7 @@ const _routes = [
   {
     name: "index___vi",
     path: "/",
-    component: () => import("./_nuxt/index-BsLnEloy.js")
+    component: () => import("./_nuxt/index-DbZ_RX4I.js")
   },
   {
     name: "login___vi",
@@ -699,13 +700,13 @@ const _routes = [
   {
     name: "checkout-auth___vi",
     path: "/checkout/auth",
-    meta: __nuxt_page_meta$9 || {},
+    meta: __nuxt_page_meta$a || {},
     component: () => import("./_nuxt/auth-CCjTczbG.js")
   },
   {
     name: "products-id___vi",
     path: "/products/:id()",
-    component: () => import("./_nuxt/_id_-mVsj_fQH.js")
+    component: () => import("./_nuxt/_id_-DipDCs7J.js")
   },
   {
     name: "account-orders___vi",
@@ -713,6 +714,12 @@ const _routes = [
     meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": "auth" } },
     component: () => import("./_nuxt/orders-JQx7P-wa.js"),
     children: [
+      {
+        name: "account-orders-id___vi",
+        path: ":id()",
+        meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": "auth" } },
+        component: () => import("./_nuxt/index-6dZTdm7p.js")
+      },
       {
         name: "account-orders-id-tracking___vi",
         path: ":id()/tracking",
@@ -736,7 +743,7 @@ const _routes = [
   {
     name: "category-slug___vi",
     path: "/category/:slug()",
-    component: () => import("./_nuxt/_slug_-D_0QbnrJ.js")
+    component: () => import("./_nuxt/_slug_-B9A2O8xr.js")
   },
   {
     name: "checkout-review___vi",
@@ -7044,7 +7051,7 @@ const plugins = [
 const layouts = {
   account: defineAsyncComponent(() => import("./_nuxt/account-Bh-PWT9J.js").then((m) => m.default || m)),
   checkout: defineAsyncComponent(() => import("./_nuxt/checkout-iGrpc6cR.js").then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import("./_nuxt/default-BWVhMzZ3.js").then((m) => m.default || m))
+  default: defineAsyncComponent(() => import("./_nuxt/default-CSur3IPs.js").then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
