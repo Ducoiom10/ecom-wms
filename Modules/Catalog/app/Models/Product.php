@@ -20,6 +20,7 @@ class Product extends Model
         return \Modules\Catalog\Database\Factories\ProductFactory::new();
     }
 
+    protected $fillable = ['name', 'slug', 'sku', 'description', 'price', 'category_id', 'brand_id', 'is_active'];
 
     /**
      * Relations
