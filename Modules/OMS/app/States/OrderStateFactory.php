@@ -2,7 +2,7 @@
 
 namespace Modules\OMS\States;
 
-use Modules\OMS\Exceptions\InvalidOrderStateException;
+use App\Exceptions\InvalidOrderStateException;
 use Modules\OMS\Models\Order;
 
 class OrderStateFactory

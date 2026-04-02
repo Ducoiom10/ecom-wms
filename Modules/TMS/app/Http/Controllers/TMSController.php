@@ -5,7 +5,7 @@ namespace Modules\TMS\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
-use Modules\TMS\Jobs\SyncCarrierStatus;
+use App\Jobs\SyncCarrierStatus;
 use Modules\TMS\Models\DeliveryZone;
 use Modules\TMS\Models\Shipment;
 use Modules\TMS\Services\ShipmentService;

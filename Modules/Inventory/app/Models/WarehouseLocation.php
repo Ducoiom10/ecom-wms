@@ -2,6 +2,7 @@
 
 namespace Modules\Inventory\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Inventory\Models\BinLocation;
 use Modules\Inventory\Models\InventoryBatch;
@@ -10,6 +11,13 @@ use Modules\Inventory\Models\Warehouse;
 
 class WarehouseLocation extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory()
+    {
+        return \Modules\Inventory\Database\Factories\WarehouseLocationFactory::new();
+    }
+
     protected $fillable = ['warehouse_id', 'aisle', 'rack', 'level', 'bin', 'barcode', 'is_active'];
 
     public function warehouse()

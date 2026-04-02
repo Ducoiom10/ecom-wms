@@ -2,11 +2,18 @@
 
 namespace Modules\OMS\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\OMS\States\OrderStateFactory;
 
 class Order extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory()
+    {
+        return \Modules\OMS\Database\Factories\OrderFactory::new();
+    }
     protected $fillable = [
         'user_id', 'warehouse_id',
         'subtotal', 'discount', 'tax', 'shipping', 'total',

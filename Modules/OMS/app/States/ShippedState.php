@@ -2,7 +2,7 @@
 
 namespace Modules\OMS\States;
 
-use Modules\OMS\Events\OrderDelivered;
+use App\Events\OrderDelivered;
 
 class ShippedState extends OrderState
 {

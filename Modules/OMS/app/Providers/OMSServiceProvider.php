@@ -30,7 +30,6 @@ class OMSServiceProvider extends ModuleServiceProvider
      * @var string[]
      */
     protected array $providers = [
-        EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
 

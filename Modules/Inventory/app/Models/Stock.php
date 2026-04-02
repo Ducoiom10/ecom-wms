@@ -2,11 +2,19 @@
 
 namespace Modules\Inventory\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Catalog\Models\Product; // BẮT BUỘC IMPORT: Gọi Model từ Module Catalog sang để thiết lập quan hệ
+use Modules\Catalog\Models\Product;
 
 class Stock extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory()
+    {
+        return \Modules\Inventory\Database\Factories\StockFactory::new();
+    }
+
     protected $fillable = ['product_id', 'warehouse_location_id', 'quantity', 'reserved_quantity'];
 
     // Thuộc về 1 Sản phẩm

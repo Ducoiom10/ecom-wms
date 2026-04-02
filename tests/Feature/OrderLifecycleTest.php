@@ -1,6 +1,6 @@
 <?php
 
-use Modules\OMS\Exceptions\InvalidOrderStateException;
+use App\Exceptions\InvalidOrderStateException;
 use Modules\OMS\Models\Order;
 use Modules\Inventory\Models\Warehouse;
 

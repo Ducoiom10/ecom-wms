@@ -2,6 +2,7 @@
 
 namespace Modules\Catalog\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Inventory\Models\Stock;
 use Modules\Catalog\Models\Brand;
@@ -12,7 +13,13 @@ use Modules\Catalog\Models\ProductAttributeValue;
 
 class Product extends Model
 {
-    protected $fillable = ['name', 'slug', 'sku', 'description', 'price', 'category_id', 'brand_id', 'is_active'];
+    use HasFactory;
+
+    protected static function newFactory()
+    {
+        return \Modules\Catalog\Database\Factories\ProductFactory::new();
+    }
+
 
     /**
      * Relations

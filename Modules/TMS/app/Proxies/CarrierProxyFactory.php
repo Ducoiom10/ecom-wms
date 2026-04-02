@@ -3,7 +3,7 @@
 namespace Modules\TMS\Proxies;
 
 use Modules\TMS\Contracts\CarrierProxyInterface;
-use Modules\TMS\Exceptions\UnsupportedCarrierException;
+use App\Exceptions\UnsupportedCarrierException;
 
 class CarrierProxyFactory
 {

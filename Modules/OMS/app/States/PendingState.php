@@ -2,7 +2,7 @@
 
 namespace Modules\OMS\States;
 
-use Modules\OMS\Events\OrderApproved;
+use App\Events\OrderApproved;
 
 class PendingState extends OrderState
 {

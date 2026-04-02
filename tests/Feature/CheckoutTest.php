@@ -10,7 +10,7 @@ use Modules\CRM\Services\LoyaltyService;
 use Modules\Inventory\Models\Stock;
 use Modules\Inventory\Models\Warehouse;
 use Modules\Inventory\Models\WarehouseLocation;
-use Modules\OMS\Jobs\AwardLoyaltyPoints;
+use App\Jobs\AwardLoyaltyPoints;
 use Modules\OMS\Models\Order;
 use Modules\Pricing\Services\PricingService;
 

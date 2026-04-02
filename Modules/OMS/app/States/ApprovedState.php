@@ -3,7 +3,7 @@
 namespace Modules\OMS\States;
 
 use Illuminate\Support\Facades\DB;
-use Modules\OMS\Events\PickListCreated;
+use App\Events\PickListCreated;
 use Modules\WMS\Services\PickListGenerator;
 
 class ApprovedState extends OrderState

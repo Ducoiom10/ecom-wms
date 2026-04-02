@@ -143,7 +143,7 @@ return [
         */
         'generator' => [
             // app/
-            'actions' => ['path' => 'app/Actions', 'generate' => false],
+            'actions' => ['path' => 'app/Actions', 'generate' => true],
             'casts' => ['path' => 'app/Casts', 'generate' => false],
             'channels' => ['path' => 'app/Broadcasting', 'generate' => false],
             'class' => ['path' => 'app/Classes', 'generate' => false],
@@ -164,7 +164,7 @@ return [
             'policies' => ['path' => 'app/Policies', 'generate' => false],
             'provider' => ['path' => 'app/Providers', 'generate' => true],
             'repository' => ['path' => 'app/Repositories', 'generate' => false],
-            'resource' => ['path' => 'app/Transformers', 'generate' => false],
+            'resource' => ['path' => 'app/Http/Resources', 'generate' => true],
             'route-provider' => ['path' => 'app/Providers', 'generate' => true],
             'rules' => ['path' => 'app/Rules', 'generate' => false],
             'services' => ['path' => 'app/Services', 'generate' => false],
@@ -174,7 +174,7 @@ return [
             // app/Http/
             'controller' => ['path' => 'app/Http/Controllers', 'generate' => true],
             'filter' => ['path' => 'app/Http/Middleware', 'generate' => false],
-            'request' => ['path' => 'app/Http/Requests', 'generate' => false],
+            'request' => ['path' => 'app/Http/Requests', 'generate' => true],
 
             // config/
             'config' => ['path' => 'config', 'generate' => true],
