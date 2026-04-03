@@ -41,146 +41,146 @@ Internet
 ### Bước 1: Tạo docker-compose.yml ở root
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
-  # ====================================
-  # Backend - Laravel API
-  # ====================================
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ecom-wms-backend
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - FRONTEND_URL=${FRONTEND_URL}
-    volumes:
-      - backend_storage:/var/www/html/storage
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - ecom-network
+    # ====================================
+    # Backend - Laravel API
+    # ====================================
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: ecom-wms-backend
+        restart: unless-stopped
+        ports:
+            - "8000:8000"
+        environment:
+            - APP_ENV=production
+            - APP_DEBUG=false
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - FRONTEND_URL=${FRONTEND_URL}
+        volumes:
+            - backend_storage:/var/www/html/storage
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        networks:
+            - ecom-network
 
-  # ====================================
-  # Frontend - Nuxt.js
-  # ====================================
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NUXT_PUBLIC_API_URL=${NUXT_PUBLIC_API_URL}
-    container_name: ecom-wms-frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NUXT_PUBLIC_API_URL=${NUXT_PUBLIC_API_URL}
-    depends_on:
-      - backend
-    networks:
-      - ecom-network
+    # ====================================
+    # Frontend - Nuxt.js
+    # ====================================
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+            args:
+                - NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE}
+        container_name: ecom-wms-frontend
+        restart: unless-stopped
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=production
+            - NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE}
+        depends_on:
+            - backend
+        networks:
+            - ecom-network
 
-  # ====================================
-  # Queue Worker
-  # ====================================
-  queue:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ecom-wms-queue
-    restart: unless-stopped
-    command: php artisan queue:work --daemon --queue=default,emails,notifications
-    environment:
-      - APP_ENV=production
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
-    depends_on:
-      - mysql
-      - redis
-    networks:
-      - ecom-network
+    # ====================================
+    # Queue Worker
+    # ====================================
+    queue:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: ecom-wms-queue
+        restart: unless-stopped
+        command: php artisan queue:work --daemon --queue=default,emails,notifications
+        environment:
+            - APP_ENV=production
+            - DB_HOST=mysql
+            - REDIS_HOST=redis
+        depends_on:
+            - mysql
+            - redis
+        networks:
+            - ecom-network
 
-  # ====================================
-  # MySQL Database
-  # ====================================
-  mysql:
-    image: mysql:8.0
-    container_name: ecom-wms-mysql
-    restart: unless-stopped
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 5
-    networks:
-      - ecom-network
+    # ====================================
+    # MySQL Database
+    # ====================================
+    mysql:
+        image: mysql:8.0
+        container_name: ecom-wms-mysql
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        volumes:
+            - mysql_data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 10s
+            retries: 5
+        networks:
+            - ecom-network
 
-  # ====================================
-  # Redis Cache
-  # ====================================
-  redis:
-    image: redis:7-alpine
-    container_name: ecom-wms-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - ecom-network
+    # ====================================
+    # Redis Cache
+    # ====================================
+    redis:
+        image: redis:7-alpine
+        container_name: ecom-wms-redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - ecom-network
 
-  # ====================================
-  # Nginx Reverse Proxy
-  # ====================================
-  nginx:
-    image: nginx:alpine
-    container_name: ecom-wms-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - ecom-network
+    # ====================================
+    # Nginx Reverse Proxy
+    # ====================================
+    nginx:
+        image: nginx:alpine
+        container_name: ecom-wms-nginx
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./ssl:/etc/nginx/ssl:ro
+        depends_on:
+            - backend
+            - frontend
+        networks:
+            - ecom-network
 
 volumes:
-  mysql_data:
-  redis_data:
-  backend_storage:
+    mysql_data:
+    redis_data:
+    backend_storage:
 
 networks:
-  ecom-network:
-    driver: bridge
+    ecom-network:
+        driver: bridge
 ```
 
 ### Bước 2: Tạo backend/Dockerfile
@@ -259,8 +259,8 @@ RUN npm ci
 COPY . .
 
 # Build arguments for environment
-ARG NUXT_PUBLIC_API_URL
-ENV NUXT_PUBLIC_API_URL=$NUXT_PUBLIC_API_URL
+ARG NUXT_PUBLIC_API_BASE
+ENV NUXT_PUBLIC_API_BASE=$NUXT_PUBLIC_API_BASE
 
 # Build
 RUN npm run build
@@ -290,11 +290,11 @@ DB_ROOT_PASSWORD=root_password_here
 
 # URLs
 FRONTEND_URL=http://localhost:3000
-NUXT_PUBLIC_API_URL=http://localhost:8000/api
+NUXT_PUBLIC_API_BASE=http://localhost:8000/api
 
 # Production URLs (thay bằng domain thật)
 # FRONTEND_URL=https://your-domain.com
-# NUXT_PUBLIC_API_URL=https://api.your-domain.com/api
+# NUXT_PUBLIC_API_BASE=https://api.your-domain.com/api
 EOF
 ```
 
@@ -434,9 +434,11 @@ npm ci
 
 # Set production environment
 cat > .env << 'EOF'
-NUXT_PUBLIC_API_URL=https://api.your-domain.com/api
+NUXT_PUBLIC_API_BASE=https://api.your-domain.com/api
 NUXT_PUBLIC_APP_NAME=EcomWMS
-NUXT_PUBLIC_APP_ENV=production
+NUXT_PUBLIC_REVERB_HOST=reverb.your-domain.com
+NUXT_PUBLIC_REVERB_PORT=443
+NUXT_PUBLIC_REVERB_KEY=prod-app-key
 EOF
 
 # Build production
@@ -458,7 +460,7 @@ pm2 startup
 server {
     listen 80;
     server_name your-domain.com www.your-domain.com;
-    
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -536,12 +538,11 @@ REVERB_SCHEME=https
 ### frontend/.env (Production)
 
 ```dotenv
-NUXT_PUBLIC_API_URL=https://api.your-domain.com/api
+NUXT_PUBLIC_API_BASE=https://api.your-domain.com/api
 NUXT_PUBLIC_APP_NAME=EcomWMS
-NUXT_PUBLIC_APP_ENV=production
-NUXT_PUBLIC_WS_HOST=reverb.your-domain.com
-NUXT_PUBLIC_WS_PORT=443
-NUXT_PUBLIC_WS_KEY=prod-app-key
+NUXT_PUBLIC_REVERB_HOST=reverb.your-domain.com
+NUXT_PUBLIC_REVERB_PORT=443
+NUXT_PUBLIC_REVERB_KEY=prod-app-key
 ```
 
 ---
@@ -554,59 +555,59 @@ Tạo `.github/workflows/deploy.yml`:
 name: Deploy EcomWMS
 
 on:
-  push:
-    branches: [main]
+    push:
+        branches: [main]
 
 jobs:
-  deploy-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          
-      - name: Install Dependencies
-        run: composer install --no-dev --optimize-autoloader
-        
-      - name: Run Tests
-        run: php artisan test
-        
-      - name: Deploy to Server
-        run: |
-          # Deploy via SSH or other method
+    deploy-backend:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./backend
 
-  deploy-frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Install Dependencies
-        run: npm ci
-        
-      - name: Build
-        run: npm run build
-        env:
-          NUXT_PUBLIC_API_URL: ${{ secrets.NUXT_PUBLIC_API_URL }}
-          
-      - name: Deploy to Server
-        run: |
-          # Deploy frontend build
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.2"
+
+            - name: Install Dependencies
+              run: composer install --no-dev --optimize-autoloader
+
+            - name: Run Tests
+              run: php artisan test
+
+            - name: Deploy to Server
+              run: |
+                  # Deploy via SSH or other method
+
+    deploy-frontend:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./frontend
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Build
+              run: npm run build
+              env:
+                  NUXT_PUBLIC_API_BASE: ${{ secrets.NUXT_PUBLIC_API_BASE }}
+
+            - name: Deploy to Server
+              run: |
+                  # Deploy frontend build
 ```
 
 ---

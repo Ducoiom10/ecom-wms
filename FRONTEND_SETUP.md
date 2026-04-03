@@ -58,51 +58,16 @@ frontend/
 
 ## 🚀 Hướng dẫn Setup
 
-### Bước 1: Copy files từ storefront-pwa/
+### Bước 1: Khởi tạo và cài dependencies trong frontend/
 
 ```bash
-# Từ root directory của project
-FRONTEND_DIR="frontend"
-STOREFRONT_DIR="storefront-pwa"
-
-mkdir -p $FRONTEND_DIR
-
-# Copy tất cả files (trừ node_modules)
-echo "Copying frontend files..."
-rsync -av \
-    --exclude='node_modules' \
-    --exclude='.nuxt' \
-    --exclude='.output' \
-    --exclude='dist' \
-    "$STOREFRONT_DIR/" "$FRONTEND_DIR/"
-
-echo "✅ Copy completed!"
-ls "$FRONTEND_DIR/"
+cd frontend
+npm install
+npm run typecheck
+npm run build
 ```
 
-**Hoặc copy thủ công:**
-
-```bash
-STOREFRONT="storefront-pwa"
-FRONTEND="frontend"
-mkdir -p $FRONTEND
-
-# Copy directories
-for dir in assets components composables layouts middleware pages plugins stores types public; do
-    if [ -d "$STOREFRONT/$dir" ]; then
-        cp -r "$STOREFRONT/$dir" "$FRONTEND/"
-        echo "✅ Copied $dir"
-    fi
-done
-
-# Copy files
-for file in app.vue error.vue nuxt.config.ts tsconfig.json tailwind.config.ts package.json package-lock.json; do
-    if [ -f "$STOREFRONT/$file" ]; then
-        cp "$STOREFRONT/$file" "$FRONTEND/"
-        echo "✅ Copied $file"
-    fi
-done
-```
+`frontend/` hiện là source storefront chính thức. Không copy code từ `storefront-pwa/`; thư mục đó chỉ còn là artefact legacy rỗng đang chờ Windows giải phóng lock để xóa hẳn.
 
 ---
 
@@ -153,25 +118,19 @@ cat > frontend/.env.example << 'EOF'
 # ====================================
 # Backend API Configuration
 # ====================================
-NUXT_PUBLIC_API_URL=http://localhost:8000/api
+NUXT_PUBLIC_API_BASE=http://localhost:8000/api
 
 # ====================================
 # App Configuration
 # ====================================
 NUXT_PUBLIC_APP_NAME=EcomWMS
-NUXT_PUBLIC_APP_ENV=development
 
 # ====================================
 # WebSocket (Laravel Reverb)
 # ====================================
-NUXT_PUBLIC_WS_HOST=localhost
-NUXT_PUBLIC_WS_PORT=8080
-NUXT_PUBLIC_WS_KEY=your-reverb-app-key
-
-# ====================================
-# Optional: Analytics
-# ====================================
-# NUXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NUXT_PUBLIC_REVERB_HOST=localhost
+NUXT_PUBLIC_REVERB_PORT=8080
+NUXT_PUBLIC_REVERB_KEY=your-reverb-app-key
 EOF
 ```
 
@@ -183,37 +142,39 @@ File `frontend/package.json` nên được cập nhật:
 
 ```json
 {
-  "name": "ecom-wms-frontend",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "typecheck": "nuxt typecheck",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts"
-  },
-  "dependencies": {
-    "@headlessui/vue": "^1.7.23",
-    "@heroicons/vue": "^2.2.0",
-    "@nuxt/image": "^1.10.0",
-    "@nuxtjs/i18n": "^9.5.5",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@pinia/nuxt": "^0.11.1",
-    "@vueuse/nuxt": "^13.3.0",
-    "axios": "^1.9.0",
-    "laravel-echo": "^1.17.1",
-    "nuxt": "^3.0.0",
-    "pinia": "^2.0.0",
-    "vue": "^3.0.0"
-  },
-  "devDependencies": {
-    "@nuxt/eslint": "^1.0.0",
-    "@nuxtjs/eslint-config-typescript": "^12.0.0",
-    "typescript": "^5.0.0"
-  }
+    "name": "ecom-wms-frontend",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "typecheck": "nuxt typecheck",
+        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts"
+    },
+    "dependencies": {
+        "@headlessui/vue": "^1.7.23",
+        "@heroicons/vue": "^2.2.0",
+        "@nuxtjs/i18n": "^9.5.5",
+        "@nuxtjs/tailwindcss": "^6.14.0",
+        "@pinia/nuxt": "^0.11.1",
+        "@vueuse/nuxt": "^13.3.0",
+        "axios": "^1.9.0",
+        "laravel-echo": "^1.17.1",
+        "nuxt": "^3.21.2",
+        "pinia": "^3.0.4",
+        "pusher-js": "^8.4.0",
+        "swiper": "^12.1.3",
+        "vue": "^3.5.31"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/typography": "^0.5.16",
+        "@types/node": "^25.5.0",
+        "typescript": "^5.9.3"
+    }
 }
 ```
 
@@ -226,52 +187,55 @@ File `frontend/nuxt.config.ts` đầy đủ:
 ```typescript
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-  
-  // Modules
-  modules: [
-    '@nuxtjs/tailwindcss',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-    '@nuxt/image',
-    '@nuxtjs/i18n',
-  ],
-  
-  // Runtime config (exposed to client)
-  runtimeConfig: {
-    public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:8000/api',
-      appName: process.env.NUXT_PUBLIC_APP_NAME || 'EcomWMS',
-      wsHost: process.env.NUXT_PUBLIC_WS_HOST || 'localhost',
-      wsPort: process.env.NUXT_PUBLIC_WS_PORT || '8080',
-      wsKey: process.env.NUXT_PUBLIC_WS_KEY || '',
-    },
-  },
-  
-  // TypeScript
-  typescript: {
-    strict: true,
-    typeCheck: true,
-  },
-  
-  // Tailwind
-  tailwindcss: {
-    configPath: '~/tailwind.config.ts',
-  },
-  
-  // i18n
-  i18n: {
-    locales: [
-      { code: 'vi', name: 'Tiếng Việt', file: 'vi.json' },
-      { code: 'en', name: 'English', file: 'en.json' },
+    compatibilityDate: "2024-11-01",
+    devtools: { enabled: true },
+
+    modules: [
+        "@nuxtjs/tailwindcss",
+        "@pinia/nuxt",
+        "@vueuse/nuxt",
+        "@nuxtjs/i18n",
     ],
-    defaultLocale: 'vi',
-    langDir: 'locales/',
-  },
-  
-  // Compatibility
-  compatibilityDate: '2024-01-01',
-})
+
+    runtimeConfig: {
+        public: {
+            apiBase:
+                process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8000/api",
+            reverbKey: process.env.NUXT_PUBLIC_REVERB_KEY || "local",
+            reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || "localhost",
+            reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || "8080",
+            appName: process.env.NUXT_PUBLIC_APP_NAME || "Storefront PWA",
+        },
+    },
+
+    app: {
+        pageTransition: { name: "page", mode: "out-in" },
+        head: {
+            link: [{ rel: "preconnect", href: "https://fonts.bunny.net" }],
+        },
+    },
+
+    css: ["~/assets/css/tailwind.css", "~/assets/css/transitions.css"],
+
+    typescript: {
+        strict: true,
+    },
+
+    nitro: {
+        prerender: {
+            crawlLinks: false,
+            routes: ["/"],
+        },
+    },
+
+    i18n: {
+        defaultLocale: "vi",
+        locales: [{ code: "vi", name: "Tiếng Việt" }],
+        bundle: {
+            optimizeTranslationDirective: false,
+        },
+    },
+});
 ```
 
 ---
@@ -283,38 +247,38 @@ Tạo file `frontend/composables/useApi.ts`:
 ```typescript
 // Composable để call API
 export const useApi = () => {
-  const config = useRuntimeConfig()
-  const baseURL = config.public.apiUrl
+    const config = useRuntimeConfig();
+    const baseURL = config.public.apiUrl;
 
-  const get = async <T>(endpoint: string): Promise<T> => {
-    const { data, error } = await useFetch<T>(`${baseURL}${endpoint}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    if (error.value) throw error.value
-    return data.value as T
-  }
+    const get = async <T>(endpoint: string): Promise<T> => {
+        const { data, error } = await useFetch<T>(`${baseURL}${endpoint}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
 
-  const post = async <T>(endpoint: string, body: object): Promise<T> => {
-    const { data, error } = await useFetch<T>(`${baseURL}${endpoint}`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    if (error.value) throw error.value
-    return data.value as T
-  }
+        if (error.value) throw error.value;
+        return data.value as T;
+    };
 
-  return { get, post }
-}
+    const post = async <T>(endpoint: string, body: object): Promise<T> => {
+        const { data, error } = await useFetch<T>(`${baseURL}${endpoint}`, {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (error.value) throw error.value;
+        return data.value as T;
+    };
+
+    return { get, post };
+};
 ```
 
 ---
@@ -324,57 +288,60 @@ export const useApi = () => {
 Tạo file `frontend/stores/auth.ts`:
 
 ```typescript
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 interface User {
-  id: number
-  name: string
-  email: string
+    id: number;
+    name: string;
+    email: string;
 }
 
 interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
+    user: User | null;
+    token: string | null;
+    isAuthenticated: boolean;
 }
 
-export const useAuthStore = defineStore('auth', {
-  state: (): AuthState => ({
-    user: null,
-    token: null,
-    isAuthenticated: false,
-  }),
-  
-  actions: {
-    async login(email: string, password: string) {
-      const config = useRuntimeConfig()
-      const response = await $fetch(`${config.public.apiUrl}/auth/login`, {
-        method: 'POST',
-        body: { email, password },
-      })
-      
-      this.token = (response as any).token
-      this.user = (response as any).user
-      this.isAuthenticated = true
-      
-      // Persist token
-      if (process.client) {
-        localStorage.setItem('auth_token', this.token || '')
-      }
+export const useAuthStore = defineStore("auth", {
+    state: (): AuthState => ({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+    }),
+
+    actions: {
+        async login(email: string, password: string) {
+            const config = useRuntimeConfig();
+            const response = await $fetch(
+                `${config.public.apiUrl}/auth/login`,
+                {
+                    method: "POST",
+                    body: { email, password },
+                },
+            );
+
+            this.token = (response as any).token;
+            this.user = (response as any).user;
+            this.isAuthenticated = true;
+
+            // Persist token
+            if (process.client) {
+                localStorage.setItem("auth_token", this.token || "");
+            }
+        },
+
+        logout() {
+            this.user = null;
+            this.token = null;
+            this.isAuthenticated = false;
+            if (process.client) {
+                localStorage.removeItem("auth_token");
+            }
+        },
     },
-    
-    logout() {
-      this.user = null
-      this.token = null
-      this.isAuthenticated = false
-      if (process.client) {
-        localStorage.removeItem('auth_token')
-      }
-    },
-  },
-  
-  persist: true,
-})
+
+    persist: true,
+});
 ```
 
 ---
@@ -386,81 +353,81 @@ Tạo file `frontend/types/api.ts`:
 ```typescript
 // API Response types
 export interface ApiResponse<T> {
-  data: T
-  message?: string
-  success: boolean
+    data: T;
+    message?: string;
+    success: boolean;
 }
 
 export interface PaginatedResponse<T> {
-  data: T[]
-  meta: {
-    current_page: number
-    last_page: number
-    per_page: number
-    total: number
-  }
-  links: {
-    first: string
-    last: string
-    prev: string | null
-    next: string | null
-  }
+    data: T[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
+    links: {
+        first: string;
+        last: string;
+        prev: string | null;
+        next: string | null;
+    };
 }
 
 // Product types
 export interface Product {
-  id: number
-  name: string
-  sku: string
-  slug: string
-  price: number
-  category_id: number
-  is_active: boolean
-  created_at: string
-  updated_at: string
-  category?: Category
+    id: number;
+    name: string;
+    sku: string;
+    slug: string;
+    price: number;
+    category_id: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    category?: Category;
 }
 
 // Category types
 export interface Category {
-  id: number
-  name: string
-  slug: string
-  parent_id: number | null
+    id: number;
+    name: string;
+    slug: string;
+    parent_id: number | null;
 }
 
 // Cart types
 export interface CartItem {
-  id: number
-  product_id: number
-  quantity: number
-  price: number
-  product?: Product
+    id: number;
+    product_id: number;
+    quantity: number;
+    price: number;
+    product?: Product;
 }
 
 export interface Cart {
-  id: number
-  user_id: number
-  items: CartItem[]
-  total: number
+    id: number;
+    user_id: number;
+    items: CartItem[];
+    total: number;
 }
 
 // Order types
 export interface Order {
-  id: number
-  order_number: string
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  total: number
-  items: OrderItem[]
-  created_at: string
+    id: number;
+    order_number: string;
+    status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+    total: number;
+    items: OrderItem[];
+    created_at: string;
 }
 
 export interface OrderItem {
-  id: number
-  product_id: number
-  quantity: number
-  price: number
-  product?: Product
+    id: number;
+    product_id: number;
+    quantity: number;
+    price: number;
+    product?: Product;
 }
 ```
 
@@ -493,13 +460,13 @@ nano .env
 ```
 
 Cấu hình `.env`:
+
 ```dotenv
-NUXT_PUBLIC_API_URL=http://localhost:8000/api
+NUXT_PUBLIC_API_BASE=http://localhost:8000/api
 NUXT_PUBLIC_APP_NAME=EcomWMS
-NUXT_PUBLIC_APP_ENV=development
-NUXT_PUBLIC_WS_HOST=localhost
-NUXT_PUBLIC_WS_PORT=8080
-NUXT_PUBLIC_WS_KEY=your-reverb-app-key
+NUXT_PUBLIC_REVERB_HOST=localhost
+NUXT_PUBLIC_REVERB_PORT=8080
+NUXT_PUBLIC_REVERB_KEY=your-reverb-app-key
 ```
 
 ---
@@ -582,12 +549,14 @@ npm run build
 ## 🔧 Xử lý lỗi thường gặp
 
 ### Lỗi: "Cannot find module"
+
 ```bash
 rm -rf node_modules
 npm install
 ```
 
 ### Lỗi: "TypeScript error"
+
 ```bash
 # Kiểm tra tsconfig.json
 cat tsconfig.json
@@ -597,6 +566,7 @@ npm run typecheck
 ```
 
 ### Lỗi: CORS từ backend
+
 ```bash
 # Kiểm tra backend/.env
 # FRONTEND_URL=http://localhost:3000
@@ -607,6 +577,7 @@ cd backend && php artisan serve
 ```
 
 ### Lỗi: "nuxt: command not found"
+
 ```bash
 npm install -g nuxi
 # Hoặc dùng npx
@@ -614,6 +585,7 @@ npx nuxt dev
 ```
 
 ### Port đã bị dùng
+
 ```bash
 # Đổi port
 npm run dev -- --port 3001

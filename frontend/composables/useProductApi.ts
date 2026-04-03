@@ -1,0 +1,1 @@
+export { useProductApi } from './api/productApi'
